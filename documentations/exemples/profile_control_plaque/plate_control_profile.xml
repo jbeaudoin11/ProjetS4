@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE apply_profile SYSTEM "../comm_log_protocol.dtd">
+
+<apply_profile>
+  <config_params_list user="udooer">
+    <config datetime="2014-08-22T09:00:00.000000" operation_mode="active" control_type="plate_control" plate_pos_type="hall">
+    </config>
+    <params datetime="2014-08-22T09:00:00.000000" nsamples="8" params_control_loop1_type="z_transfer_function">
+      <!-- Ordre de B0... A1... (B0 est numC)rateur z0 ) -->
+      <params_control_loop1 index="0">
+        <params_control_loop_coeff index="0" value ="0"/>
+        <params_control_loop_coeff index="1" value ="0"/>
+        <params_control_loop_coeff index="2" value ="0"/>
+        <params_control_loop_coeff index="3" value ="0"/>
+        <params_control_loop_coeff index="4" value ="0"/>
+        <params_control_loop_coeff index="5" value ="0"/>
+        <params_control_loop_coeff index="6" value ="0"/>
+      </params_control_loop1>
+      <params_control_loop1 index="1">
+        <params_control_loop_coeff index="0" value ="0"/>
+        <params_control_loop_coeff index="1" value ="0"/>
+        <params_control_loop_coeff index="2" value ="0"/>
+        <params_control_loop_coeff index="3" value ="0"/>
+        <params_control_loop_coeff index="4" value ="0"/>
+        <params_control_loop_coeff index="5" value ="0"/>
+        <params_control_loop_coeff index="6" value ="0"/>
+      </params_control_loop1>
+      <params_control_loop1 index="2">
+        <params_control_loop_coeff index="0" value ="0"/>
+        <params_control_loop_coeff index="1" value ="0"/>
+        <params_control_loop_coeff index="2" value ="0"/>
+        <params_control_loop_coeff index="3" value ="0"/>
+        <params_control_loop_coeff index="4" value ="0"/>
+        <params_control_loop_coeff index="5" value ="0"/>
+        <params_control_loop_coeff index="6" value ="0"/>
+      </params_control_loop1>
+      <eq_point va="0" vb="0" vc="0"/>
+    </params>
+    <host_params datetime="2014-08-22T09:00:00.000000">
+      <!--control_plugin id="0" name="current_control_plugin"></control_plugin-->
+      <!--control_plugin id="0" name="calibration_plugin"></control_plugin-->
+      <!--control_plugin id="0" name="current_force_zpos_mapping_plugin"></control_plugin-->
+      <!--control_plugin id="0" name="inductance_zpos_mapping_plugin"></control_plugin-->
+      <!--control_plugin id="0" name="induced_voltage_mapping_plugin"></control_plugin-->
+      <control_plugin id="0" name="dummy_control_plugin"></control_plugin>
+      <image_processing_plugin id="0" name="dummy_image_processing_plugin"></image_processing_plugin>
+    </host_params>
+  </config_params_list>
+</apply_profile>
