@@ -8,7 +8,7 @@ data_y = Fs;
 data_x = z_pos;
 to_x = data_x(end);
 
-[f, gof, output] = fit(data_x, data_y, 'rat03', 'Upper', [-1 Inf Inf Inf], 'Lower', [-1 -Inf -Inf -Inf]);
+[f, gof] = fit(data_x, data_y, 'rat03', 'Upper', [-1 Inf Inf Inf], 'Lower', [-1 -Inf -Inf -Inf]);
 
 scatter(data_x, data_y)
 hold on

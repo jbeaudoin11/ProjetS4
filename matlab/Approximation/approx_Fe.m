@@ -1,6 +1,14 @@
 clc, clear, close, figure, warning off;
 
-%% Fe
+%{
+    TODO
+    
+    Comment définir b_E1 vu qu'il dépend de i_k ?
+
+%}
+
+
+%% Fe(z, i)
 load('Fe_attraction.mat')
 
 %% 1
@@ -8,7 +16,7 @@ data_x = z_m1A;
 data_y = Fe_m1A;
 to_x = data_x(end);
 
-[f, gof, output] = fit(data_x, data_y, 'rat03', 'Upper', [-1 Inf Inf Inf], 'Lower', [-1 -Inf -Inf -Inf]);
+[f, gof] = fit(data_x, data_y, 'rat03', 'Upper', [0 Inf Inf Inf], 'Lower', [-1 -Inf -Inf -Inf]);
 
 subplot(2, 1, 1)
 scatter(data_x, data_y)
@@ -27,7 +35,7 @@ data_x = z_m2A;
 data_y = Fe_m2A;
 to_x = data_x(end);
 
-[f, gof, output] = fit(data_x, data_y, 'rat03', 'Upper', [-1 Inf Inf Inf], 'Lower', [-1 -Inf -Inf -Inf]);
+[f, gof] = fit(data_x, data_y, 'rat03', 'Upper', [0 Inf Inf Inf], 'Lower', [-1 -Inf -Inf -Inf]);
 
 subplot(2, 1, 2)
 scatter(data_x, data_y)
