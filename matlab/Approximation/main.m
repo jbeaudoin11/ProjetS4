@@ -14,7 +14,7 @@ n = size(data_x, 1);
 % plot(data_x, [data_y, avg])
 scatter(data_x, data_y)
 hold on
-f = fit(data_x, data_y, 'poly3')
+f = fit(data_x, data_y, 'rat03', 'Upper', [-1 Inf Inf Inf], 'Lower', [-1 -Inf -Inf -Inf])
 fplot(f, [0, to_x])
 hold off
 % legend('poly4', 'exp1', 'exp2', 'Location', 'southeast')
