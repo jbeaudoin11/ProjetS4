@@ -17,15 +17,30 @@ data_y_2 = Fe_m2A;
 to_x_2 = data_x_2(end);
 ik_2 = -2;
 
-eq_base = @(x, ik, cv, b_E1) (ik*abs(ik) + b_E1*ik)./(x.^3 + cv(2).*x.^2 + cv(3).*x + cv(4));
+eq_base = @(x, ik, coeffs, b_E1) (ik*abs(ik) + b_E1*ik)./(x.^3 + coeffs(2).*x.^2 + coeffs(3).*x + coeffs(4));
 
-start_point = -10;
-% end_point = -500;
-end_point = -100;
-step = -10;
+% try 1
+% start_point = -10000;
+% end_point = -15000;
+% step = -10;
+
+% try 2
+start_point = -5;
+end_point = -20;
+step = -1;
+
+% try 1
+% start_point = -10000;
+% end_point = -15000;
+% step = -10;
+
+
+% Setup
 points = start_point:step:end_point;
 N = size(points, 2);
 
+coeffs = cell(N, 1);
+bE1s = zeros(N, 1);
 corr = zeros(N, 1);
 
 %% Find the best b_E1
@@ -34,60 +49,63 @@ parfor n = 1:N
     b = points(n);
     
     [f, gof] = fit(data_x_1, data_y_1, 'rat03', 'Upper', [b Inf Inf Inf], 'Lower', [b -Inf -Inf -Inf]);
-    cv = coeffvalues( f );
+    coeffs_found = coeffvalues( f );
+    coeffs{n} = coeffs_found;
 
-    bE1 = cv(1)/ik_1 - abs(ik_1);
-    eq = @(x, ik) eq_base(x, ik, cv, bE1);
+    bE1 = coeffs_found(1)/ik_1 - abs(ik_1);
+    bE1s(n) = bE1;
+    eq = @(x, ik) eq_base(x, ik, coeffs_found, bE1);
 
-%     r2_1 = rsquared(data_x_1, data_y_1, @(x) eq(x, ik_1, cv, bE1))
-    coefs = corrcoef(eq(data_x_1, ik_1), data_y_1);
-    r2_1 = coefs(1, 2);
+    ems_1 = mean_err_quad(data_x_1, data_y_1, @(x) eq(x, ik_1));
+    ems_2 = mean_err_quad(data_x_2, data_y_2, @(x) eq(x, ik_2));
     
-%     r2_2 = rsquared(data_x_2, data_y_2, @(x) eq(x, ik_2, cv, bE1));
-    coefs = corrcoef(eq(data_x_2, ik_2), data_y_2);
-    r2_2 = coefs(1, 2);
-    vpa(r2_2)
-    
-    corr(n, 1) = r2_1 * r2_2;
-    
-    if(b == start_point || b == end_point)
-        figure
-
-        subplot(2, 1, 1)
-        plot(data_x_1, data_y_1)
-        hold on
-        fplot(@(x) eq(x, ik_1), [0, to_x_1])
-        hold off
-        title(['b = ', num2str(b)])
-
-        subplot(2, 1, 2)
-        plot(data_x_2, data_y_2)
-        hold on
-        fplot(@(x) eq(x, ik_2), [0, to_x_2])
-        hold off
-    end
+    corr(n, 1) = ems_2 + ems_1;
 end
 
-[v, i] = max(corr);
-i
-vpa(v)
+[v, i] = min(corr)
 
-%% Final
-% 
-% subplot(2, 1, 1)
-% scatter(data_x, data_y)
-% hold on
-% fplot(@(x) s_1(x, -1), [0, to_x])
-% 
-% hold off
-% xlabel('z_{m1A}')
-% ylabel('Fe_{m1A}')
-% rsquared(data_x, data_y, @(x) s_1(x, ik))
-% 
-% subplot(2, 1, 2)
-% scatter(data_x, data_y)
-% hold on
-% fplot(@(x) s_1(x, -2), [0, to_x])
-% hold off
-% xlabel('z_{m2A}')
-% ylabel('Fe_{m2A}')
+%% Plot
+
+figure
+
+% First
+subplot(2, 3, 1)
+plot(data_x_1, data_y_1)
+hold on
+fplot(@(x) eq_base(x, ik_1, coeffs{1}, bE1s(1)), [0, to_x_1])
+hold off
+title(['b = ', num2str(bE1s(1))])
+
+subplot(2, 3, 4)
+plot(data_x_2, data_y_2)
+hold on
+fplot(@(x) eq_base(x, ik_2, coeffs{1}, bE1s(1)), [0, to_x_2])
+hold off
+
+% Best
+subplot(2, 3, 2)
+plot(data_x_1, data_y_1)
+hold on
+fplot(@(x) eq_base(x, ik_1, coeffs{i}, bE1s(i)), [0, to_x_1])
+hold off
+title(['b = ', num2str(bE1s(i))])
+
+subplot(2, 3, 5)
+plot(data_x_2, data_y_2)
+hold on
+fplot(@(x) eq_base(x, ik_2, coeffs{i}, bE1s(i)), [0, to_x_2])
+hold off
+
+% Last
+subplot(2, 3, 3)
+plot(data_x_1, data_y_1)
+hold on
+fplot(@(x) eq_base(x, ik_1, coeffs{end}, bE1s(end)), [0, to_x_1])
+hold off
+title(['b = ', num2str(bE1s(end))])
+
+subplot(2, 3, 6)
+plot(data_x_2, data_y_2)
+hold on
+fplot(@(x) eq_base(x, ik_2, coeffs{end}, bE1s(end)), [0, to_x_2])
+hold off
