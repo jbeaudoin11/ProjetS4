@@ -25,8 +25,8 @@ eq_base = @(x, ik, coeffs, b_E1) (ik*abs(ik) + b_E1*ik)./(x.^3 + coeffs(2).*x.^2
 % step = -10;
 
 % try 2
-start_point = -5;
-end_point = -20;
+start_point = -1;
+end_point = -30;
 step = -1;
 
 % try 1
