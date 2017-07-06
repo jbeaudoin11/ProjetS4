@@ -9,7 +9,6 @@ function [ res_out ] = SubMask( data, mask, w, h )
             end
         end
     end
-
-
+    
 end
 

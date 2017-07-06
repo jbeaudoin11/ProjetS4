@@ -5,8 +5,9 @@ zmax_img = imread('zmax.bmp');
 zmin_img = imread('zmin.bmp');
 vmax_img = imread('vmax.bmp');
 none_img = imread('none.bmp');
+low_light_img = imread('low_light.bmp');
 
-imgs = {asv_img, zmax_img, zmin_img, vmax_img, none_img};
+imgs = {asv_img, zmax_img, zmin_img, vmax_img, none_img, low_light_img};
 
 threshold = 210;
 radius_threshold = 2;
@@ -14,11 +15,12 @@ ball_region_size = 35;
 cell_size = 4;
 
 % for i=1:5
-for i=1:4
-% for i=3
+% for i=1:4
+for i=6
     img = cell2mat(imgs(i));
     
     data = img(:,:,2); % Use the green layer since it looks better
+    imshow(data)
     data = data > threshold; % threshold version
     h = size(data, 1);
     w = size(data, 2);
