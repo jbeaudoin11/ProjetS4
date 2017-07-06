@@ -9,7 +9,7 @@ low_light_img = imread('low_light.bmp');
 
 imgs = {asv_img, zmax_img, zmin_img, vmax_img, none_img, low_light_img};
 
-threshold = 210;
+% threshold = 210;
 radius_threshold = 2;
 ball_region_size = 35;
 cell_size = 4;
@@ -21,23 +21,28 @@ for i=6
     
     data = img(:,:,2); % Use the green layer since it looks better
     imshow(data)
+    
+    threshold = mean(data(240, :));
+    threshold = threshold - 0.3*threshold;
     data = data > threshold; % threshold version
+    imshow(data)
+    
     h = size(data, 1);
     w = size(data, 2);
 
     [c, r] = FindBigCircle(data, w, h);
     r = r - radius_threshold;
 
-    figure;
-    tmp = insertShape(double(data), 'Circle', [c, r], 'Color', 'blue');
+%     figure;
+%     tmp = insertShape(double(data), 'Circle', [c, r], 'Color', 'blue');
     [p_ball, p1] = SearchBallInCircleArea(data, c, r, w, h, cell_size, ball_region_size);
     
     if p_ball(1) == -1
         disp(['No ball in img ', num2str(i)])
     else
-        tmp = insertShape(tmp, 'Rectangle', [p1, ball_region_size, ball_region_size], 'Color', 'green');
-        tmp = insertShape(tmp, 'FilledCircle', [p_ball, 2], 'Color', 'green');
+%         tmp = insertShape(tmp, 'Rectangle', [p1, ball_region_size, ball_region_size], 'Color', 'green');
+%         tmp = insertShape(tmp, 'FilledCircle', [p_ball, 2], 'Color', 'green');
     end
     
-    imshow(tmp)
+%     imshow(tmp)
 end
