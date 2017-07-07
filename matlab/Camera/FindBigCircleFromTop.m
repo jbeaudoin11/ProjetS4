@@ -1,7 +1,5 @@
-function [ c_out, r_out ] = FindBigCircleFromTop( data, w, h )
+function [ c_out, r_out ] = FindBigCircleFromTop( data, w, h, y)
     %% X
-    y = floor(h/4);
-    
     xL = 1;
     xR = w;
     

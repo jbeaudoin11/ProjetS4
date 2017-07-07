@@ -1,7 +1,5 @@
-function [ c_out, r_out ] = FindBigCircleFromBot( data, w, h )
-    %% X
-    y = floor(3*h/4);
-    
+function [ c_out, r_out ] = FindBigCircleFromBot( data, w, h, y )
+    %% Try to find the distance in X of the circle at a heigth of y
     xL = 1;
     xR = w;
     
@@ -21,7 +19,7 @@ function [ c_out, r_out ] = FindBigCircleFromBot( data, w, h )
         end
     end
 
-    %% Y
+    %% Try to find the Y distance of the circle where we found the previous right X
     x = xR;
     
     yT = 1;
@@ -35,12 +33,16 @@ function [ c_out, r_out ] = FindBigCircleFromBot( data, w, h )
         end
     end
     
-    %% Center
+    %% Calculate the center of the circle
     dx = floor((xR-xL)/2);
     dy = floor((yB-yT)/2);    
     c_out = [xL + dx, yT + dy];
 
-    %% Radius
-    r_out = floor(sqrt(double(dx^2 + dy^2)));
+    %% Calculate and do a basic validation of radius
+    if dx <= 0 || dy <= 0
+        r_out = -1;
+    else
+        r_out = floor(sqrt(double(dx^2 + dy^2)));
+    end
 end
 

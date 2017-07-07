@@ -17,7 +17,8 @@ function [ p_out, p1_out ] = SearchBallInCircleArea( data, c, r, w, h, cell_size
         
         for x = xL:cell_size:xR
             if ~data(y, x)
-                p1_out = [x, y] - 10;
+                % TODO search if nb of neighbors > ?
+                p1_out = [x-15, y-10]; % random numbers
                 found = true;
                 break
             end
@@ -33,7 +34,7 @@ function [ p_out, p1_out ] = SearchBallInCircleArea( data, c, r, w, h, cell_size
     end
     
     %% Center of geometries
-    yT = p1_out(2);
+    yT = max([1, c(2) - r, p1_out(2)]);
     yB = min([h, c(2) + r, p1_out(2) + ball_region_size]);
     nb_p_x = 0;
     nb_p_y = 0;
@@ -42,31 +43,58 @@ function [ p_out, p1_out ] = SearchBallInCircleArea( data, c, r, w, h, cell_size
     
     for y = yT:yB
         dy = c(2) - y;
-        dx = floor(sqrt(r^2 + dy^2));
+        dx = floor(sqrt(r^2 - dy^2));
         
-        xL = p1_out(1);
-        xR = min([w, c(1) + dx, p1_out(1) + ball_region_size]);
+        [xL, iL] = max([1, c(1) - dx, p1_out(1)]);
+        [xR, iR] = min([w, c(1) + dx, p1_out(1) + ball_region_size]);        
         
-        nb_p_y = nb_p_y + 1;
-        m_y = m_y + y;
-        
-        % left
-        for x = xL:xR
-            if ~data(y, x)
-                nb_p_x = nb_p_x + 1;
-                m_x = m_x + x;
-                break
+        % Find the first black pixel from the left
+        if iL ~= 2
+            found = false;
+            for x = xL:xR
+                if ~data(y, x)
+                    xL = x;
+                    found = true;
+                    break
+                end
+            end
+            
+            if ~found
+                continue;
             end
         end
         
-        % right
-        for x = xR:-1:xL
-            if ~data(y, x)
-                nb_p_x = nb_p_x + 1;
-                m_x = m_x + x;
-                break
+        % Find the first black pixel from the right
+        if iR ~= 2
+            found = false;
+            for x = xR:-1:xL
+                if ~data(y, x)
+                    xR = x;
+                    found = true;
+                    break
+                end
+            end
+            
+            if ~found
+                continue;
             end
         end
+        
+        nb_p = (xR - xL) + 1;
+        if nb_p == 1
+            continue
+        end
+        
+        nb_p_x = nb_p_x + nb_p;
+        m_x = m_x + sum(xL:xR);
+        
+        nb_p_y = nb_p_y + nb_p;
+        m_y = m_y + nb_p * y;
+        
+    end
+    
+    if nb_p_x == 0
+        return;
     end
     
     p_out = [floor(m_x/nb_p_x), floor(m_y/nb_p_y)];
