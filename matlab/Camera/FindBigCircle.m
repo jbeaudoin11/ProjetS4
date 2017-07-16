@@ -7,19 +7,19 @@ function [ c_out, r_out ] = FindBigCircle( data, w, h )
     
     %% Find the circle
     
-    % 1/4
+    % 1/5
     [ct1, rt1] = FindBigCircleFromTop(data, w, h, floor(h*0.2));
-    % 1/3
+    % 2/5
     [ct2, rt2] = FindBigCircleFromTop(data, w, h, floor(h*0.4));
     
-    % 2/3
+    % 3/5
     [cb1, rb1] = FindBigCircleFromBot(data, w, h, floor(h*0.6));
-    % 3/4
+    % 4/5
     [cb2, rb2] = FindBigCircleFromBot(data, w, h, floor(h*0.8));
     
-    radiuses = [rt1, rt2, rb1, rb2];
+%     radiuses = [rt1, rt2, rb1, rb2];
 %     radiuses = [209, 208, 207, 206];
-%     radiuses = [209, 208, 207, 208+2];
+    radiuses = [209, 208, 207, 208+2];
     centers = [ct1; ct2; cb1; cb2];
     
     %% Verify the values
