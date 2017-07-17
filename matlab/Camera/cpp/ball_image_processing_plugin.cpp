@@ -1,25 +1,31 @@
+#ifndef BALL_IMAGE_PROCESSING_PLUGIN_CPP_
+#define BALL_IMAGE_PROCESSING_PLUGIN_CPP_
+
 #include <cstdint>
 #include <string>
+#include <iostream>
+#include <algorithm>
 
-#include <image_processing_plugin.h>
+#include "image_processing_plugin.h"
 using namespace std;
 
 enum ColorLayer {
-	r = 0,
-	g = 1,
-	b = 2
+	RED = 0,
+	GREEN = 1,
+	BLUE = 2
 };
 
 struct Circle {
 	int x;
 	int y;
 	int r;
-}
+};
+
 
 class BallImageProcessingPlugin : public ImageProcessingPlugin {
 	public:
-		BallImageProcessingPlugin(); 			//vous devez utiliser ce constructeur et aucun autre
-		virtual ~BallImageProcessingPlugin();
+		inline BallImageProcessingPlugin(); 			//vous devez utiliser ce constructeur et aucun autre
+		inline virtual ~BallImageProcessingPlugin();
 		
 		/*! \brief Receive an image to process.
 		*
@@ -33,7 +39,7 @@ class BallImageProcessingPlugin : public ImageProcessingPlugin {
 		*  \param out_dYPos Y coordinate (sub-)pixel position of the ball.
 		*
 		*/
-		virtual void OnImage(
+		inline virtual void OnImage(
 			const boost::shared_array<uint8_t> in_ptrImage,
 			unsigned int in_W,
 			unsigned int in_H,
@@ -52,7 +58,7 @@ class BallImageProcessingPlugin : public ImageProcessingPlugin {
 		*  \param out_dYDiff Y speed of the ball in <input units> per second.
 		*
 		*/
-		virtual void OnBallPosition(
+		inline virtual void OnBallPosition(
 			double in_dXPos,
 			double in_dYPos,
 			double &out_dXDiff,
@@ -61,64 +67,63 @@ class BallImageProcessingPlugin : public ImageProcessingPlugin {
 
 	private:
 
-	/*
-		Pre processing the image,
-		generate a binary version of the image
-	*/
-	vector<vector<bool>> _ImgPreProcessing(
-		const boost::shared_array<uint8_t> &img,
-		const unsigned int &W,
-		const unsigned int &H
-	);
+		/*
+			Pre processing the image,
+			generate a binary version of the image
+		*/
+		inline vector<vector<bool>> _ImgPreProcessing(
+			const boost::shared_array<uint8_t> &img,
+			const unsigned int &W,
+			const unsigned int &H
+		);
 
-	/*
-		Get a specific color matrix from the image
-	*/
-	vector<vector<uint8_t>> _getColorLayer(
-		const boost::shared_array<uint8_t> &img,
-		const unsigned int &W,
-		const unsigned int &H
-		const ColorLayer &layer
-	);
+		/*
+			Get a specific color matrix from the image
+		*/
+		inline vector<vector<uint8_t>> _getColorLayer(
+			const boost::shared_array<uint8_t> &img,
+			const unsigned int &W,
+			const unsigned int &H,
+			const ColorLayer &layer
+		);
 
-	/*
-		Generate a treshold/binary version of a matrix
-	*/
-	vector<vector<bool>> _generateTresholdVersion(
-		const vector<vector<uint8_t>> &gray_mat,
-		const unsigned int &W,
-		const unsigned int &H
-	);
+		/*
+			Generate a treshold/binary version of a matrix
+		*/
+		inline vector<vector<bool>> _generateTresholdVersion(
+			const vector<vector<uint8_t>> &gray_mat,
+			const unsigned int &W,
+			const unsigned int &H
+		);
 
-	/*
-		Search the ball area (white plate circle)
-	*/
-	Circle _searchPlateArea(
-		const vector<vector<bool>> &mat,
-		const unsigned int &W,
-		const unsigned int &H
-	);
+		/*
+			Search the ball area (white plate circle)
+		*/
+		inline Circle _searchPlateArea(
+			const vector<vector<bool>> &mat,
+			const unsigned int &W,
+			const unsigned int &H
+		);
 
-	/*
-		Search for the white circle at a given row
-	*/
-	Circle _searchCircle(
-		const vector<vector<bool>> &mat,
-		const unsigned int &W,
-		const unsigned int &H,
-		const unsigned int &y
-	);
+		/*
+			Search for the white circle at a given row
+		*/
+		inline Circle _searchCircle(
+			const vector<vector<bool>> &mat,
+			const unsigned int &W,
+			const unsigned int &H,
+			const unsigned int &y
+		);
 
-	/*
-		Search for the ball in the plate area
-	*/
-	void _searchBallInCircle(
-		const vector<vector<bool>> &mat,
-		const unsigned int &W,
-		const unsigned int &H,
-		const Circle &area
-	);
-
+		/*
+			Search for the ball in the plate area
+		*/
+		inline void _searchBallInCircle(
+			const vector<vector<bool>> &mat,
+			const unsigned int &W,
+			const unsigned int &H,
+			const Circle &area
+		);
 };
 
 BallImageProcessingPlugin::BallImageProcessingPlugin() {
@@ -137,11 +142,11 @@ void BallImageProcessingPlugin::OnImage(
 	double &out_dYPos
 ) {
 
-	vector<vector<uint8_t>> green = _getColorLayer(img, W, H, ColorLayer.g);
+	vector<vector<bool>> mat = _ImgPreProcessing(in_ptrImage, in_W, in_H);
 	
-	for(y=0;y<20;y++){
-		for(x=0;x<20;x++){
-			cout << to_string(green[y][x]) << " ";
+	for(int y=75;y<85;y++){
+		for(int x=177;x<182;x++){
+			cout << to_string(mat[y][x]) << " ";
 		}	
 		cout << endl;
 	}
@@ -166,23 +171,21 @@ vector<vector<bool>> BallImageProcessingPlugin::_ImgPreProcessing(
 	const unsigned int &W,
 	const unsigned int &H
 ) {
-	return _generateTresholdVersion(_getColorLayer(img, W, H, ColorLayer.g), W, H);
+	return _generateTresholdVersion(_getColorLayer(img, W, H, GREEN), W, H);
 }
 
 vector<vector<uint8_t>> BallImageProcessingPlugin::_getColorLayer(
 	const boost::shared_array<uint8_t> &img,
 	const unsigned int &W,
-	const unsigned int &H
+	const unsigned int &H,
 	const ColorLayer &layer
 ) {
 	vector<vector<uint8_t>> mat;
 	mat.resize(H, vector<uint8_t>(W, 0));
 
-	img[z, y, x]
-
-	for(y=0;y<H;y++){
-		for(x=0;x<W;x++){
-			mat[y][x] = img[layer*(W*H) + y*W + x];
+	for(int y=0;y<H;y++){
+		for(int x=0;x<W;x++){
+			mat[y][x] = img[(y*H+x) * 3 + layer]; // from 3D coords to index
 		}	
 	}
 	
@@ -195,29 +198,52 @@ vector<vector<bool>> BallImageProcessingPlugin::_generateTresholdVersion(
 	const unsigned int &H
 ) {
 
+	vector<uint8_t> values(4, 0);
+	values[0] = gray_mat[floor(96)][240];
+	values[1] = gray_mat[floor(192)][240];
+	values[2] = gray_mat[floor(288)][240];
+	values[3] = gray_mat[floor(384)][240];
+	uint8_t treshold_val = *max_element(values.begin(), values.end());
+
+	float k = 0.99;
+	if(treshold_val < 50) {
+		k = 0.4;
+	} else if(treshold_val < 100) {
+		k = 0.75;		
+	} else if(treshold_val < 200) {
+		k = 0.85;		
+	}
+	treshold_val *= k;
+
+	vector<vector<bool>> mat;
+	mat.resize(H, vector<bool>(W, false));
+
+	for(int y=0;y<H;y++){
+		for(int x=0;x<W;x++){
+			mat[y][x] = gray_mat[y][x] > treshold_val;
+		}	
+	}
+
+	return mat;
 }
-
-
-
-
-
-
 
 
 //ne rien modifier passé ce commentaire
-extern "C"
-{
-	ImageProcessingPlugin * Load();
-	void Unload( ImageProcessingPlugin * in_pPlugin );
-}
+// extern "C"
+// {
+// 	ImageProcessingPlugin * Load();
+// 	void Unload( ImageProcessingPlugin * in_pPlugin );
+// }
 
-void Unload( ImageProcessingPlugin * in_pPlugin )
-{
-	delete in_pPlugin;
-}
+// void Unload( ImageProcessingPlugin * in_pPlugin )
+// {
+// 	delete in_pPlugin;
+// }
 
-ImageProcessingPlugin * Load()
-{
-	//si vous changez le nom de la classe asssurez-vous de le changer aussi ci-dessous
-	return new BallImageProcessingPlugin;
-}
+// ImageProcessingPlugin * Load()
+// {
+// 	//si vous changez le nom de la classe asssurez-vous de le changer aussi ci-dessous
+// 	return new BallImageProcessingPlugin;
+// }
+
+#endif /* BALL_IMAGE_PROCESSING_PLUGIN_CPP_ */

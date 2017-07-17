@@ -15,14 +15,16 @@ namespace {
 
 int main( int argc, char **argv)
 {
-	if(argc != 2)
-	{
-		cerr << "Erreur: Vous devez specifier seulement l'image a charger" << endl;
-		return EXIT_FAILURE;
-	}
+	// if(argc != 2)
+	// {
+	// 	cerr << "Erreur: Vous devez specifier seulement l'image a charger" << endl;
+	// 	return EXIT_FAILURE;
+	// }
 
 	// Open image file
-	ifstream image_file(argv[1], ios::binary);
+	// ifstream image_file("imgs\\" + argv[1], ios::binary);
+	// ifstream image_file(argv[1], ios::binary);
+	ifstream image_file("imgs/image_0.rgb", ios::binary);
 	if(!image_file)
 	{
 		cerr << "Erreur: Chemin de l'image invalide" << endl;
@@ -42,7 +44,15 @@ int main( int argc, char **argv)
 	boost::shared_array<uint8_t> image(new uint8_t[IMAGE_SIZE]);
 	image_file.read(reinterpret_cast<char *>(image.get()), IMAGE_SIZE);
 
-	
+	for(int y=0;y<3*5;y++){
+		cout << to_string(image[y]) << " ";
+	}
+	cout << endl << endl;
+
+	BallImageProcessingPlugin plugin;
+	double x, y;
+
+	plugin.OnImage(image, IMAGE_WIDTH, IMAGE_HEIGHT, x, y);
 
 	return EXIT_SUCCESS;
 }
