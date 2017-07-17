@@ -19,7 +19,7 @@ function [ c_out, r_out ] = FindBigCircle( data, w, h )
     
 %     radiuses = [rt1, rt2, rb1, rb2];
 %     radiuses = [209, 208, 207, 206];
-    radiuses = [209, 208, 207, 208+2];
+%     radiuses = [209, 208, 207, 208+2];
     centers = [ct1; ct2; cb1; cb2];
     
     %% Verify the values
