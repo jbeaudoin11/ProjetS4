@@ -17,9 +17,7 @@ function [ c_out, r_out ] = FindBigCircle( data, w, h )
     % 4/5
     [cb2, rb2] = FindBigCircleFromBot(data, w, h, floor(h*0.8));
     
-%     radiuses = [rt1, rt2, rb1, rb2];
-%     radiuses = [209, 208, 207, 206];
-%     radiuses = [209, 208, 207, 208+2];
+    radiuses = [rt1, rt2, rb1, rb2];
     centers = [ct1; ct2; cb1; cb2];
     
     %% Verify the values
@@ -28,7 +26,8 @@ function [ c_out, r_out ] = FindBigCircle( data, w, h )
     % Test if the radius is bigger than the image or smaller than half
     % the image
     for i=1:4
-        validated_radius(i) = (radiuses(i) < w || radiuses(i) < h) || (radiuses(i) > w/2 || radiuses(i) > h/2);
+		r = radiuses(i);
+        validated_radius(i) = (r <= w/2 && r <= h/2) && (r > w/4 && r > h/4);
     end
     
     % Compare radiuses with each others

@@ -44,11 +44,6 @@ int main( int argc, char **argv)
 	boost::shared_array<uint8_t> image(new uint8_t[IMAGE_SIZE]);
 	image_file.read(reinterpret_cast<char *>(image.get()), IMAGE_SIZE);
 
-	for(int y=0;y<3*5;y++){
-		cout << to_string(image[y]) << " ";
-	}
-	cout << endl << endl;
-
 	BallImageProcessingPlugin plugin;
 	double x, y;
 

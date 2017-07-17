@@ -1,0 +1,27 @@
+# depslib dependency file v1.0
+1500326897 source:/home/jimmy/Github/ProjetS4/matlab/Camera/Camera/load_image.cpp
+	<boost/shared_array.hpp>
+	<cstdlib>
+	<iostream>
+	<fstream>
+	"ball_image_processing_plugin.cpp"
+
+1500330719 /home/jimmy/Github/ProjetS4/matlab/Camera/Camera/ball_image_processing_plugin.cpp
+	<cstdint>
+	<cmath>
+	<string>
+	<iostream>
+	<algorithm>
+	"image_processing_plugin.h"
+
+1461346038 /home/jimmy/Github/ProjetS4/matlab/Camera/Camera/image_processing_plugin.h
+	<boost/shared_array.hpp>
+
+1500330167 source:/home/jimmy/Github/ProjetS4/matlab/Camera/Camera/ball_image_processing_plugin.cpp
+	<cstdint>
+	<cmath>
+	<string>
+	<iostream>
+	<algorithm>
+	"image_processing_plugin.h"
+
