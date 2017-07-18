@@ -1,9 +1,13 @@
 #include <boost/shared_array.hpp>
 #include <cstdlib>
+#include <chrono>
 #include <iostream>
 #include <fstream>
+#include <string>
 
 #include "ball_image_processing_plugin.cpp"
+
+#define BENCHMARK_IT 10000
 
 using namespace std;
 
@@ -46,8 +50,19 @@ int main( int argc, char **argv)
 
 	BallImageProcessingPlugin plugin;
 	double x, y;
+	int i = BENCHMARK_IT;
 
-	plugin.OnImage(image, IMAGE_WIDTH, IMAGE_HEIGHT, x, y);
+	clock_t start_time = clock();
+	while(i--) {
+		plugin.OnImage(image, IMAGE_WIDTH, IMAGE_HEIGHT, x, y);
+		// cout << "(" << to_string(x) << ", " << to_string(y) << ") "<< endl;
+	}
+	clock_t end_time = clock();
+	double duration = (end_time - start_time) / (double) CLOCKS_PER_SEC;
+
+	cout << "IT : " << to_string(BENCHMARK_IT) << endl;
+	cout << "TIME : " << to_string(duration) << endl;
+	cout << "IMG/S : " << to_string(BENCHMARK_IT/duration) << endl;
 
 	return EXIT_SUCCESS;
 }

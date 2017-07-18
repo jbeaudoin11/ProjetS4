@@ -35,14 +35,6 @@ enum ColorLayer {
 	BLUE = 2
 };
 
-// Utilities
-pair<int, int> max_i(const int a, const int b) {
-	return (a>b) ? pair<int, int>(a, 0) : pair<int, int>(b, 1);
-}
-pair<int, int> min_i(const int a, const int b) {
-	return (a<b) ? pair<int, int>(a, 0) : pair<int, int>(b, 1);
-}
-
 class Circle {
 	public:
 		int x = -1;
@@ -106,6 +98,15 @@ class BallImageProcessingPlugin : public ImageProcessingPlugin {
 			double &out_dXDiff,
 			double &out_dYDiff
 		);
+
+		// Utilities
+		inline pair<int, int> max_with_index(const int a, const int b) {
+			return (a>b) ? pair<int, int>(a, 0) : pair<int, int>(b, 1);
+		}
+
+		inline pair<int, int> min_with_index(const int a, const int b) {
+			return (a<b) ? pair<int, int>(a, 0) : pair<int, int>(b, 1);
+		}
 
 	private:
 
@@ -195,10 +196,8 @@ void BallImageProcessingPlugin::OnImage(
 	// Search the circular plate area in the image
 	Circle plate_area = _searchPlateArea(mat);
 
-	cout << "(" << to_string(plate_area.x) << ", " << to_string(plate_area.y) << ") " << to_string(plate_area.r) << endl;
-
-	out_dXPos = -1.0;
-	out_dYPos = -1.0;
+	// Search the ball in the plate area
+	tie(out_dXPos, out_dYPos) = _searchBallInCircle(mat, plate_area);
 }
 
 void BallImageProcessingPlugin::OnBallPosition(
@@ -415,12 +414,6 @@ pair<int, int> BallImageProcessingPlugin::_searchBallInCircle(
 	const vector<vector<bool>> &mat,
 	const Circle &area
 ) {
-	int y_t = max(0, area.y - area.r);
-	int y_b = min(H-1, area.y + area.r);
-
-	int dy=0, dx=0, x_l=0, x_r=0;
-	bool found = false;
-
 	pair<int, int> pixel_pos = _searchFirstBlackPixelInCircle(mat, area);
 	if(pixel_pos.first < 0) {
 		return pixel_pos;
@@ -448,7 +441,7 @@ pair<int, int> BallImageProcessingPlugin::_searchFirstBlackPixelInCircle(
 
 		x_l = area.x - dx;
 		x_r = area.x + dx;
-	
+
 		for(int x=x_l; x<=x_r; x+=SEARCH_BALL_GRID_CELL_SIZE) {
 			if(!mat[y][x]) {
 				return pair<int, int>(x, y);
@@ -485,8 +478,8 @@ pair<int, int> BallImageProcessingPlugin::_calculateCenterOfMassOfTheBall(
 		dy = area.y - y;
 		dx = (int) sqrt((double) (pow(area.r, 2) - pow(dy, 2)));
 
-		tie(x_l, i_l) = max_i(area.x - dx, pixel_pos.x);
-		tie(x_r, i_r) = min_i(area.x + dx, , pixel_pos.x + SEARCH_BALL_REGION_SIZE);
+		tie(x_l, i_l) = max_with_index(area.x - dx, pixel_pos.first);
+		tie(x_r, i_r) = min_with_index(area.x + dx, pixel_pos.first + SEARCH_BALL_REGION_SIZE);
 
 		// Find the first back pixel from left
 		if(!i_l) { // If we are not the circle edge
@@ -498,7 +491,7 @@ pair<int, int> BallImageProcessingPlugin::_calculateCenterOfMassOfTheBall(
 					break;
 				}
 			}
-			
+
 			if(!found) continue;
 		}
 
@@ -512,7 +505,7 @@ pair<int, int> BallImageProcessingPlugin::_calculateCenterOfMassOfTheBall(
 					break;
 				}
 			}
-			
+
 			if(!found) continue;
 		}
 

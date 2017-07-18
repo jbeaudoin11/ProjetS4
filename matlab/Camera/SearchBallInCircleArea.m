@@ -12,8 +12,8 @@ function [ p_out, p1_out ] = SearchBallInCircleArea( data, c, r, w, h, cell_size
         dy = c(2) - y;
         dx = floor(sqrt(r^2 - dy^2));
         
-        xL = max(1, c(1) - dx);
-        xR = min(w, c(1) + dx);
+        xL = c(1) - dx;
+        xR = c(1) + dx;
         
         for x = xL:cell_size:xR
             if ~data(y, x)
