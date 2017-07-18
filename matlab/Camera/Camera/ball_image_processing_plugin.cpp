@@ -3,6 +3,7 @@
 
 #include <cstdint>
 #include <cmath>
+#include <utility>
 #include <string>
 #include <iostream>
 #include <algorithm>
@@ -23,6 +24,9 @@
 #define W_1_2 240
 #define W_1_4 120
 
+#define SEARCH_BALL_GRID_CELL_SIZE 4
+#define SEARCH_BALL_REGION_SIZE 40
+
 using namespace std;
 
 enum ColorLayer {
@@ -30,6 +34,14 @@ enum ColorLayer {
 	GREEN = 1,
 	BLUE = 2
 };
+
+// Utilities
+pair<int, int> max_i(const int a, const int b) {
+	return (a>b) ? pair<int, int>(a, 0) : pair<int, int>(b, 1);
+}
+pair<int, int> min_i(const int a, const int b) {
+	return (a<b) ? pair<int, int>(a, 0) : pair<int, int>(b, 1);
+}
 
 class Circle {
 	public:
@@ -138,9 +150,26 @@ class BallImageProcessingPlugin : public ImageProcessingPlugin {
 		/*
 			Search for the ball in the plate area
 		*/
-		inline void _searchBallInCircle(
+		inline pair<int, int> _searchBallInCircle(
 			const vector<vector<bool>> &mat,
 			const Circle &area
+		);
+
+		/*
+			Search the position of the first black pixel in the area and assume it's the ball
+		*/
+		inline pair<int, int> _searchFirstBlackPixelInCircle(
+			const vector<vector<bool>> &mat,
+			const Circle &area
+		);
+
+		/*
+			Calculate the center of mass of the ball
+		*/
+		inline pair<int, int> _calculateCenterOfMassOfTheBall(
+			const vector<vector<bool>> &mat,
+			const Circle &area,
+			const pair<int, int> &pixel_pos
 		);
 };
 
@@ -294,8 +323,8 @@ Circle BallImageProcessingPlugin::_searchCircle(
 ) {
 	Circle plate_area;
 
-	int x_l = 0;
-	int x_r = W-1;
+	unsigned int x_l = 0;
+	unsigned int x_r = W-1;
 
 	//******** HORIZONTAL ********
 	// Search the first "white" pixel from left for a height of y
@@ -327,7 +356,7 @@ Circle BallImageProcessingPlugin::_searchCircle(
 	}
 
 	//******** VERTICAL ********
-	int y_t, y_b;
+	unsigned int y_t = 0, y_b = 0;
 	if(y < H_1_2) {
 		y_t = y;
 		y_b = 0;
@@ -382,10 +411,127 @@ Circle BallImageProcessingPlugin::_searchCircle(
 	return plate_area;
 }
 
-void BallImageProcessingPlugin::_searchBallInCircle(
+pair<int, int> BallImageProcessingPlugin::_searchBallInCircle(
 	const vector<vector<bool>> &mat,
 	const Circle &area
-);
+) {
+	int y_t = max(0, area.y - area.r);
+	int y_b = min(H-1, area.y + area.r);
+
+	int dy=0, dx=0, x_l=0, x_r=0;
+	bool found = false;
+
+	pair<int, int> pixel_pos = _searchFirstBlackPixelInCircle(mat, area);
+	if(pixel_pos.first < 0) {
+		return pixel_pos;
+	}
+
+	return _calculateCenterOfMassOfTheBall(mat, area, pixel_pos);
+}
+
+pair<int, int> BallImageProcessingPlugin::_searchFirstBlackPixelInCircle(
+	const vector<vector<bool>> &mat,
+	const Circle &area
+) {
+	int y_t = area.y - area.r;
+	int y_b = area.y + area.r;
+
+	int dy=0;
+	int dx=0;
+	int x_l=0;
+	int x_r=0;
+
+	// Search the first black pixel in the circle from top
+	for(int y=y_t; y<=y_b; y+=SEARCH_BALL_GRID_CELL_SIZE) {
+		dy = area.y - y;
+		dx = (int) sqrt((double) (pow(area.r, 2) - pow(dy, 2)));
+
+		x_l = area.x - dx;
+		x_r = area.x + dx;
+	
+		for(int x=x_l; x<=x_r; x+=SEARCH_BALL_GRID_CELL_SIZE) {
+			if(!mat[y][x]) {
+				return pair<int, int>(x, y);
+			}
+		}
+	}
+
+	return pair<int, int>(-1, -1);
+}
+
+pair<int, int> BallImageProcessingPlugin::_calculateCenterOfMassOfTheBall(
+	const vector<vector<bool>> &mat,
+	const Circle &area,
+	const pair<int, int> &pixel_pos
+) {
+	int y_t = max(area.y - area.r, pixel_pos.second);
+	int y_b = min(area.y + area.r, pixel_pos.second + SEARCH_BALL_REGION_SIZE);
+
+	int dy=0;
+	int dx=0;
+	int x_l=0, i_l=0;
+	int x_r=0, i_r=0;
+
+	int nb_pix_row = 0;
+	int nb_pix_x = 0;
+	int nb_pix_y = 0;
+	int mass_x = 0;
+	int mass_y = 0;
+
+	bool found = false;
+
+	// Calculate, in a "rectangle" area, the center of mass of the ball
+	for(int y=y_t; y<=y_b; y+=SEARCH_BALL_GRID_CELL_SIZE) {
+		dy = area.y - y;
+		dx = (int) sqrt((double) (pow(area.r, 2) - pow(dy, 2)));
+
+		tie(x_l, i_l) = max_i(area.x - dx, pixel_pos.x);
+		tie(x_r, i_r) = min_i(area.x + dx, , pixel_pos.x + SEARCH_BALL_REGION_SIZE);
+
+		// Find the first back pixel from left
+		if(!i_l) { // If we are not the circle edge
+			found = false;
+			for(int x=x_l; x<=x_r; x++) {
+				if(!mat[y][x]) {
+					x_l = x;
+					found = true;
+					break;
+				}
+			}
+			
+			if(!found) continue;
+		}
+
+		// Find the first back pixel from right
+		if(!i_r) { // If we are not the circle edge
+			found = false;
+			for(int x=x_r; x>=x_l; x--) {
+				if(!mat[y][x]) {
+					x_l = x;
+					found = true;
+					break;
+				}
+			}
+			
+			if(!found) continue;
+		}
+
+		nb_pix_row = (x_r - x_l) + 1;
+		if(nb_pix_row == 1) continue; // There was no black pixel in this line
+
+		nb_pix_x += nb_pix_row;
+		for(int i=x_l; i<=x_r; i++) {
+			mass_x += i;
+		}
+
+		nb_pix_y += nb_pix_row;
+		mass_y += nb_pix_row * y;
+	}
+
+	if(!nb_pix_x) return pair<int, int>(-1, -1);
+
+	return pair<int, int>(mass_x/nb_pix_x, mass_y/nb_pix_y);
+}
 
 
 //ne rien modifier passé ce commentaire
