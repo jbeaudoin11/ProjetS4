@@ -382,6 +382,11 @@ Circle BallImageProcessingPlugin::_searchCircle(
 	return plate_area;
 }
 
+void BallImageProcessingPlugin::_searchBallInCircle(
+	const vector<vector<bool>> &mat,
+	const Circle &area
+);
+
 
 //ne rien modifier passé ce commentaire
 // extern "C"
