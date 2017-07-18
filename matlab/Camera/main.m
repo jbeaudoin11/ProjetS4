@@ -19,21 +19,21 @@ cell_size = 4;
 % pos_fig = figure;
 
 img_index = 1;
-% for i=1:length(imgs)
-for i=2
+for i=1:length(imgs)
+% for i=2
     img = cell2mat(imgs(i));
 %     figure(colored_fig)
 %     imshow(img)
-%     subplot(4, 4, img_index)
-%     imshow(img)
-%     title(['Image ', num2str(i)]);
+    subplot(4, 4, img_index)
+    imshow(img)
+    title(['Image ', num2str(i)]);
     
     % Pick only the green layer since it looks better
     data = img(:,:,2); % Use the green layer 
     h = size(data, 1);
     w = size(data, 2);
-    figure
-    imshow(data)
+%     figure
+%     imshow(data)
     
     data = GetTreshold(data, w, h); % threshold version
 %     figure
@@ -52,8 +52,8 @@ for i=2
     %% Drawing
     
     % Show the big circle
-%     tmp = double(data);
-    tmp = insertShape(double(data), 'Circle', [c, r], 'Color', 'blue');
+    tmp = double(data);
+%     tmp = insertShape(double(data), 'Circle', [c, r], 'Color', 'blue');
 
     % Show ball area and center
     if p_ball(1) == -1
@@ -64,16 +64,16 @@ for i=2
     end
 
     % Show lines in the calculation of the big circle
-    tmp = insertShape(double(tmp), 'Line', [1, h*.2, w, h*.2], 'Color', 'green');
-    tmp = insertShape(double(tmp), 'Line', [1, h*.4, w, h*.4], 'Color', 'green');
-    tmp = insertShape(double(tmp), 'Line', [1, h*.6, w, h*.6], 'Color', 'green');
-    tmp = insertShape(double(tmp), 'Line', [1, h*.8, w, h*.8], 'Color', 'green');
+%     tmp = insertShape(double(tmp), 'Line', [1, h*.2, w, h*.2], 'Color', 'green');
+%     tmp = insertShape(double(tmp), 'Line', [1, h*.4, w, h*.4], 'Color', 'green');
+%     tmp = insertShape(double(tmp), 'Line', [1, h*.6, w, h*.6], 'Color', 'green');
+%     tmp = insertShape(double(tmp), 'Line', [1, h*.8, w, h*.8], 'Color', 'green');
     
-    figure
-    imshow(tmp)
-    
-%     subplot(4, 4, img_index+1)
+%     figure
 %     imshow(tmp)
-%     title(['Image ', num2str(i), ' (', num2str(p_ball(1)), ', ', num2str(p_ball(2)), ')']);
-%     img_index = img_index + 2;
+    
+    subplot(4, 4, img_index+1)
+    imshow(tmp)
+    title(['Image ', num2str(i), ' (', num2str(p_ball(1)), ', ', num2str(p_ball(2)), ')']);
+    img_index = img_index + 2;
 end
