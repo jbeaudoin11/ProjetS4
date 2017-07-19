@@ -15,6 +15,7 @@
 					<Add option="-O2" />
 					<Add option="-pg" />
 					<Add option="-g" />
+					<Add option="-lboost_system" />
 				</Compiler>
 				<Linker>
 					<Add option="-pg" />
