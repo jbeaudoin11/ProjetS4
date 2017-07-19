@@ -286,12 +286,16 @@ Circle BallImageProcessingPlugin::_searchPlateArea(
 		validated_circles[i] = (r <= W_1_2 && r <= H_1_2) && (r > W_1_4 && r > H_1_4);
 	}
 
-	// Compare radiuses with each other
+	// Compare components with each other
 	for(int i=0; i<4; i++) {
 		int nb_diff_lte_2 = 0;
 		for(int j=1; j<4; j++) {
 			if(abs(circles[i].r - circles[j].r) <= 2) {
-				nb_diff_lte_2++;
+				if(abs(circles[i].x - circles[j].x) <= 2) {
+					if(abs(circles[i].y - circles[j].y) <= 2) {
+						nb_diff_lte_2++;
+					}
+				}
 			}
 		}
 		validated_circles[i] = nb_diff_lte_2 > 1;
