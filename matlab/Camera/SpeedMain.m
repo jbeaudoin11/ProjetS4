@@ -15,8 +15,24 @@ cell_size = 4;
 h = 480;
 w = 480;
 
-for img_index=1:length(imgs)
+old_positions = [];
+speeds = [];
+positions = [];
+for img_index=1:length(imgs)   
     pos = GetBallLocation(cell2mat(imgs(img_index)), w, h, radius_threshold, cell_size, ball_region_size);
+    positions = [positions; pos]; 
     
-    % TODO 
+    old_positions = AddPosition(old_positions, pos); 
+    [speed_x, speed_y] = GetBallSpeed(old_positions); 
+    speeds = [speeds; [speed_x, speed_y]]; 
 end
+
+t = 0:39;
+
+figure
+plot(t*34/30,speeds) % à modifier hihi 
+
+figure
+plot(positions(:,1),-positions(:,2))
+
+
