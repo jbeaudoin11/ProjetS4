@@ -33,12 +33,16 @@ function [ c_out, r_out ] = FindBigCircleFromTop( data, w, h, y)
         end
     end
     
-    %% Center
+        %% Calculate the center of the circle
     dx = floor((xR-xL)/2);
-    dy = floor((yB-yT)/2);
+    dy = floor((yB-yT)/2);    
     c_out = [xL + dx, yT + dy];
 
-    %% Radius
-    r_out = floor(sqrt(double(dx^2 + dy^2)));
+    %% Calculate and do a basic validation of radius
+    if dx <= 0 || dy <= 0
+        r_out = -1;
+    else
+        r_out = floor(sqrt(double(dx^2 + dy^2)));
+    end
 end
 

@@ -8,6 +8,7 @@ none_img = imread('imgs/none.bmp');
 center_top_img = imread('imgs/center_top.bmp');
 low_light_img = imread('imgs/low_light_13511.bmp');
 high_light_img = imread('imgs/high_light_2020.bmp');
+% high_light_img = imread('vitesse_max_3/image_1786.bmp');
 
 imgs = {asv_img, zmax_img, zmin_img, vmax_img, none_img, center_top_img, low_light_img, high_light_img};
 
@@ -20,9 +21,9 @@ cell_size = 4;
 
 img_index = 1;
 for i=1:length(imgs)
-% for i=2
+% for i=1
     img = cell2mat(imgs(i));
-%     figure(colored_fig)
+%     figure
 %     imshow(img)
     subplot(4, 4, img_index)
     imshow(img)
@@ -34,7 +35,7 @@ for i=1:length(imgs)
     w = size(data, 2);
 %     figure
 %     imshow(data)
-    
+%     
     data = GetTreshold(data, w, h); % threshold version
 %     figure
 %     imshow(data)
@@ -47,7 +48,7 @@ for i=1:length(imgs)
     end
     
     r = r - radius_threshold;
-    [p_ball, p1] = SearchBallInCircleArea(data, w, h, c, r, cell_size, ball_region_size);
+    [p_ball, p1] = SearchBallInCircleArea(data, c, r, cell_size, ball_region_size);
 
     %% Drawing
     
@@ -68,7 +69,7 @@ for i=1:length(imgs)
 %     tmp = insertShape(double(tmp), 'Line', [1, h*.4, w, h*.4], 'Color', 'green');
 %     tmp = insertShape(double(tmp), 'Line', [1, h*.6, w, h*.6], 'Color', 'green');
 %     tmp = insertShape(double(tmp), 'Line', [1, h*.8, w, h*.8], 'Color', 'green');
-    
+%     
 %     figure
 %     imshow(tmp)
     
