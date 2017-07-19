@@ -47,7 +47,7 @@ for i=1:length(imgs)
     end
     
     r = r - radius_threshold;
-    [p_ball, p1] = SearchBallInCircleArea(data, c, r, w, h, cell_size, ball_region_size);
+    [p_ball, p1] = SearchBallInCircleArea(data, w, h, c, r, cell_size, ball_region_size);
 
     %% Drawing
     

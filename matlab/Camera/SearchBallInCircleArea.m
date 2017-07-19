@@ -1,4 +1,4 @@
-function [ p_out, p1_out ] = SearchBallInCircleArea( data, c, r, w, h, cell_size, ball_region_size )
+function [ p_out, p1_out ] = SearchBallInCircleArea( data, c, r, cell_size, ball_region_size )
     yT = c(2) - r;
     yB = c(2) + r;
     
@@ -34,8 +34,8 @@ function [ p_out, p1_out ] = SearchBallInCircleArea( data, c, r, w, h, cell_size
     end
     
     %% Center of geometries
-    yT = max([c(2) - r, p1_out(2)]);
-    yB = min([c(2) + r, p1_out(2) + ball_region_size]);
+    yT = max_int_with_index(c(2) - r, p1_out(2));
+    yB = min_int_with_index(c(2) + r, p1_out(2) + ball_region_size);
     nb_p_x = 0;
     nb_p_y = 0;
     m_x = 0;
@@ -45,8 +45,8 @@ function [ p_out, p1_out ] = SearchBallInCircleArea( data, c, r, w, h, cell_size
         dy = c(2) - y;
         dx = floor(sqrt(r^2 - dy^2));
         
-        [xL, iL] = max([c(1) - dx, p1_out(1)]);
-        [xR, iR] = min([c(1) + dx, p1_out(1) + ball_region_size]); 
+        [xL, iL] = max_int_with_index(c(1) - dx, p1_out(1));
+        [xR, iR] = min_int_with_index(c(1) + dx, p1_out(1) + ball_region_size); 
         
         % Find the first black pixel from the left
         if iL == 2
@@ -86,7 +86,7 @@ function [ p_out, p1_out ] = SearchBallInCircleArea( data, c, r, w, h, cell_size
         end
         
         nb_p_x = nb_p_x + nb_p;
-        m_x = m_x + sum(xL:xR);
+        m_x = m_x + floor((nb_p*(xL+xR))/2);
         
         nb_p_y = nb_p_y + nb_p;
         m_y = m_y + nb_p * y;

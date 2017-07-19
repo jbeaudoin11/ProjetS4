@@ -419,6 +419,9 @@ pair<int, int> BallImageProcessingPlugin::_searchBallInCircle(
 		return pixel_pos;
 	}
 
+	pixel_pos.first -= 10;
+	pixel_pos.second -= 15;
+
 	return _calculateCenterOfMassOfTheBall(mat, area, pixel_pos);
 }
 
@@ -513,9 +516,7 @@ pair<int, int> BallImageProcessingPlugin::_calculateCenterOfMassOfTheBall(
 		if(nb_pix_row == 1) continue; // There was no black pixel in this line
 
 		nb_pix_x += nb_pix_row;
-		for(int i=x_l; i<=x_r; i++) {
-			mass_x += i;
-		}
+		mass_x += nb_pix_row * (x_l+x_r) / 2;
 
 		nb_pix_y += nb_pix_row;
 		mass_y += nb_pix_row * y;
