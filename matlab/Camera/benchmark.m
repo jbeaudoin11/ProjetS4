@@ -1,7 +1,8 @@
 clc, clear, close all;
-
-src_files = dir('benchmark_imgs/*.bmp');  % the folder in which ur images exists
-imgs_length = length(src_files);
+folder_path = 'benchmark_imgs/';
+% folder_path = 'vitesse_max_3/';
+src_files = dir(folder_path);  % the folder in which ur images exists
+imgs_length = length(strcat([folder_path, '*.bmp']));
 
 imgs_ids = zeros(imgs_length, 1);
 for i = 1:imgs_length
@@ -13,7 +14,7 @@ src_files = src_files(sorted_indexes);
 
 imgs = cell(double(imgs_length), 1);
 for i = 1:imgs_length
-    file_path = strcat('benchmark_imgs/',src_files(i).name);
+    file_path = strcat(folder_path, src_files(i).name);
     imgs{i} = imread(file_path);
 end
 
@@ -30,7 +31,7 @@ tic
 while toc <= 5
     pos = GetBallLocation(cell2mat(imgs(img_index)), w, h, radius_threshold, cell_size, ball_region_size);
     
-    %     disp(pos)
+%         disp(pos)
 %     if pos(1) == -1
 %         disp(['ERR : ', num2str(img_index)]);
 %     end
