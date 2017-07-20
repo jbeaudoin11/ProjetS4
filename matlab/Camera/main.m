@@ -20,22 +20,32 @@ cell_size = 4;
 % pos_fig = figure;
 
 img_index = 1;
-for i=1:length(imgs)
-% for i=1
+% for i=1:length(imgs)
+for i=1
     img = cell2mat(imgs(i));
-%     figure
-%     imshow(img)
-    subplot(4, 4, img_index)
+    figure
     imshow(img)
-    title(['Image ', num2str(i)]);
+    
+%     figure
+%     subplot(2, 3, 1:3)
+%     imshow(img)
+%     subplot(2, 3, 4)
+%     imshow(img(:,:,1))
+%     subplot(2, 3, 5)
+%     imshow(img(:,:,2))
+%     subplot(2, 3, 6)
+%     imshow(img(:,:,3))
+    
+%     figure
+%     subplot(4, 4, img_index)
+%     imshow(img)
+%     title(['Image ', num2str(i)]);
     
     % Pick only the green layer since it looks better
     data = img(:,:,2); % Use the green layer 
     h = size(data, 1);
     w = size(data, 2);
-%     figure
-%     imshow(data)
-%     
+    
     data = GetTreshold(data, w, h); % threshold version
 %     figure
 %     imshow(data)
@@ -54,14 +64,15 @@ for i=1:length(imgs)
     
     % Show the big circle
     tmp = double(data);
-%     tmp = insertShape(double(data), 'Circle', [c, r], 'Color', 'blue');
+    tmp = insertShape(double(data), 'Circle', [c, r], 'Color', 'blue');
 
     % Show ball area and center
     if p_ball(1) == -1
         disp(['No ball in img ', num2str(i)])
     else
+%         tmp = insertShape(tmp, 'FilledCircle', [p1(1)+15, p1(2)+10, 4], 'Color', 'green');
 %         tmp = insertShape(tmp, 'Rectangle', [p1, ball_region_size, ball_region_size], 'Color', 'green');
-        tmp = insertShape(tmp, 'FilledCircle', [p_ball, 4], 'Color', 'green');
+%         tmp = insertShape(tmp, 'FilledCircle', [p_ball, 4], 'Color', 'green');
     end
 
     % Show lines in the calculation of the big circle
@@ -70,11 +81,12 @@ for i=1:length(imgs)
 %     tmp = insertShape(double(tmp), 'Line', [1, h*.6, w, h*.6], 'Color', 'green');
 %     tmp = insertShape(double(tmp), 'Line', [1, h*.8, w, h*.8], 'Color', 'green');
 %     
-%     figure
-%     imshow(tmp)
-    
-    subplot(4, 4, img_index+1)
+    figure
     imshow(tmp)
+%     title(['Centre : (', num2str(c(1)), ', ', num2str(c(2)), ')', ' Rayon : ', num2str(r)]);
+    
+%     subplot(4, 4, img_index+1)
+%     imshow(tmp)
     title(['Image ', num2str(i), ' (', num2str(p_ball(1)), ', ', num2str(p_ball(2)), ')']);
-    img_index = img_index + 2;
+%     img_index = img_index + 2;
 end

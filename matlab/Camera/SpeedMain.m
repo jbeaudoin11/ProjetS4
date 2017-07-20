@@ -39,7 +39,8 @@ end
 t = 0:39;
 
 figure
-plot(t*34/30,speeds) % à modifier hihi 
+% plot(t*34/30,speeds) % à modifier hihi 
+plot(speeds) % à modifier hihi 
 
 figure
 plot(positions(:,1),-positions(:,2))
