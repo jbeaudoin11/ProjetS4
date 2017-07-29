@@ -10,7 +10,7 @@
 
 #include "image_processing_plugin.h"
 
-#define RADIUS_OFFSET 1
+#define RADIUS_OFFSET 2
 
 #define H 480
 #define H_1_5 96
@@ -196,6 +196,12 @@ void BallImageProcessingPlugin::OnImage(
 	// Search the circular plate area in the image
 	Circle plate_area = _searchPlateArea(mat);
 
+	if(plate_area.x < 0) {
+		out_dXPos = -1;
+		out_dYPos = -1;
+		return;
+	}
+
 	// Search the ball in the plate area
 	tie(out_dXPos, out_dYPos) = _searchBallInCircle(mat, plate_area);
 }
@@ -289,7 +295,7 @@ Circle BallImageProcessingPlugin::_searchPlateArea(
 	// Compare components with each other
 	for(int i=0; i<4; i++) {
 		int nb_diff_lte_2 = 0;
-		for(int j=1; j<4; j++) {
+		for(int j=0; j<4; j++) {
 			if(abs(circles[i].r - circles[j].r) <= 2) {
 				if(abs(circles[i].x - circles[j].x) <= 2) {
 					if(abs(circles[i].y - circles[j].y) <= 2) {

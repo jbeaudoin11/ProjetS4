@@ -1,5 +1,5 @@
 clc, clear, close all;
-folder_path = 'benchmark_imgs/';
+folder_path = 'Camera/benchmark_imgs/';
 % folder_path = 'vitesse_max_3/';
 src_files = dir(folder_path);  % the folder in which ur images exists
 imgs_length = length(strcat([folder_path, '*.bmp']));

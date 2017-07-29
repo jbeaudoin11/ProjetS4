@@ -9,11 +9,12 @@
 
 #include "ball_image_processing_plugin.cpp"
 
-#define BENCHMARK_IT 1000
+// #define BENCHMARK_IT 1000
+#define BENCHMARK_IT 10000
 
 using namespace std;
 using namespace boost;
-using namespace boost::filesystem;
+// using namespace boost::filesystem;
 
 namespace {
 	const unsigned int IMAGE_WIDTH = 480;
@@ -26,42 +27,39 @@ int main( int argc, char **argv)
 	// Read images
 	vector<shared_array<uint8_t>> imgs;
 
-	directory_iterator end();
-	for(auto& file : make_iterator_range(directory_iterator(path("../benchmark_imgs/")))) {
-		cout << file.path().string() << endl;
+	for(int f=1; f<argc; f++) {		
+		ifstream image_file(argv[f], ios::binary);
+		image_file.seekg(0, image_file.beg);
 
-		ifstream image_file(file.path().string(), ios::binary);
-		// image_file.seekg(0, image_file.beg);
-
-		// Read file
 		shared_array<uint8_t> image(new uint8_t[IMAGE_SIZE]);
 		image_file.read(reinterpret_cast<char *>(image.get()), IMAGE_SIZE);
 		imgs.push_back(image);
 	}
 
-	return EXIT_SUCCESS;
+	// cout << to_string(imgs.size()) << endl;
 
-
-	// // Benchmark
-	// BallImageProcessingPlugin plugin;
-	// double x, y;
-	// int img_index = 0;
-	// int imgs_len = imgs.size();
+	// Benchmark
+	BallImageProcessingPlugin plugin;
+	double x, y;
+	int imgs_len = imgs.size();
 	
-	// clock_t start_time = clock();
-	// int i = BENCHMARK_IT;
-	// while(i--) {
-	// 	plugin.OnImage(imgs[i], IMAGE_WIDTH, IMAGE_HEIGHT, x, y);
-	// 	img_index = img_index % imgs_len;
+	clock_t start_time = clock();
+	int i = BENCHMARK_IT;
+	// int i = 144;
+	while(i--) {
+		plugin.OnImage(imgs[i % imgs_len], IMAGE_WIDTH, IMAGE_HEIGHT, x, y);
 
-	// 	// cout << "(" << to_string(x) << ", " << to_string(y) << ") "<< endl;
-	// }
-	// clock_t end_time = clock();
-	// double duration = (end_time - start_time) / (double) CLOCKS_PER_SEC;
+		// if(x < 0) {
+		// 	cout << "WRONG " << to_string(i % imgs_len) << endl; 
+		// }
+		// cout << "(" << to_string(x) << ", " << to_string(y) << ") "<< endl;
+	}
+	clock_t end_time = clock();
+	double duration = (end_time - start_time) / (double) CLOCKS_PER_SEC;
 
-	// cout << "IT : " << to_string(BENCHMARK_IT) << endl;
-	// cout << "TIME : " << to_string(duration) << endl;
-	// cout << "IMG/S : " << to_string(BENCHMARK_IT/duration) << endl;
+	cout << "IT : " << to_string(BENCHMARK_IT) << endl;
+	cout << "TIME : " << to_string(duration) << endl;
+	cout << "IMG/S : " << to_string(BENCHMARK_IT/duration) << endl;
 
-	// return EXIT_SUCCESS;
+	return EXIT_SUCCESS;
 }
