@@ -12,8 +12,6 @@ sig = signal_1a;
 sig_len = length(sig);
 
 seg_len = 64;
-% seg_index = 0;
-% seg_indexes = (1:seg_len) + seg_index*seg_len;
 
 fs = 1/(time(2)-time(1));
 fs_bins_len = sig_len;
@@ -24,9 +22,10 @@ nb_samples_per_bit = sig_len/nb_bits;
 downsample_value = nb_samples_per_bit/seg_len;
 
 max_stop_freq_fir = fs / (2*downsample_value);
+fc = max_stop_freq_fir/2; % Center
 
-% (max_stop_freq_fir/2 + 10.7E6)/50E3 = 235.12
-LO2 = 50E3 * 235;
+% round((10.7E6 - fc)/50E3) = 193
+LO2 = 50E3 * 193;
 bandwidth = 330E3;
 
 %% Clock LO2 (frequencies shift)
@@ -40,9 +39,9 @@ sig = clock_LO2 .* sig;
 
 subplot(2, 1, 2)
 plot(fs_bins, abs(fft(sig, fs_bins_len)));
-hold on
-    plot([LO2, LO2], [0, 10E3])
-hold off
+% hold on
+%     plot([LO2, LO2], [0, 10E3])
+% hold off
 xlim([0, fs]);
 
 %% RIF
@@ -53,39 +52,44 @@ sig = filter(b, 1, sig);
 sig = downsample(sig, downsample_value);
 sig_len = length(sig);
 
-fs = max_stop_freq_fir;
+fs = 2*max_stop_freq_fir;
 fs_bins_len = sig_len;
 fs_bins = linspace(0, fs, fs_bins_len);
 
-fc = fs/4; % Center
-
 figure
 plot(fs_bins, abs(fft(sig, fs_bins_len)));
+hold on
+    plot([fc, fc], [0, 700]);
+hold off
 xlim([0, fs]);
 
 %% 12 Bandpass
-filters_freq_band = freq2rad(linspace(fc - bandwidth/2, fc + bandwidth/2, 2*M+1), fs);
+filters_freq_band = linspace(-bandwidth/2, bandwidth/2, 2*M+1) + fc;
 
 filtered_segments = zeros(2*M, seg_len, nb_bits);
 filter_order = 20;
 filter_len = filter_order+1;
-filters_b = zeros(2*M, filter_len);
 
+freq_offset = 50E3;
+
+figure
 for i=1:2*M
-    b = fir1(filter_order, [filters_freq_band(i), filters_freq_band(i+1)], 'bandpass', kaiser(filter_len, 0.5), 'noscale');
-    
+    b = fir1(filter_order, freq2rad([filters_freq_band(i)+freq_offset, filters_freq_band(i+1)-freq_offset], fs), 'bandpass', ones(filter_len, 1));
+
     for seg_index=0:nb_bits-1
         seg_indexes = (1:seg_len) + seg_index*seg_len;
         seg = sig(seg_indexes);
         filtered_segments(i, :, seg_index+1) = filter(b, 1, seg)';
     end
 end
+hold off
 
 
 
 %% 12 Demod
 filter_fast_len = seg_len;
 filter_fast = ones(1, filter_fast_len)/filter_fast_len;
+
 nb_seg_filter_slow = 10;
 filter_slow_len = seg_len * nb_seg_filter_slow;
 filter_slow = ones(1, filter_fast_len)/filter_slow_len;
