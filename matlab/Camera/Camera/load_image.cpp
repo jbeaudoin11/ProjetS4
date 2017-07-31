@@ -40,7 +40,7 @@ int main( int argc, char **argv)
 
 	// Benchmark
 	BallImageProcessingPlugin plugin;
-	double x, y;
+	double x, y, dx, dy;
 	int imgs_len = imgs.size();
 	
 	clock_t start_time = clock();
@@ -48,6 +48,8 @@ int main( int argc, char **argv)
 	// int i = 144;
 	while(i--) {
 		plugin.OnImage(imgs[i % imgs_len], IMAGE_WIDTH, IMAGE_HEIGHT, x, y);
+		plugin.OnBallPosition(x, y, dx, dy);
+		
 
 		// if(x < 0) {
 		// 	cout << "WRONG " << to_string(i % imgs_len) << endl; 

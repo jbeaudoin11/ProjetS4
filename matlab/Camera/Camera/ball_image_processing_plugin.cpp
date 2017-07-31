@@ -172,10 +172,15 @@ class BallImageProcessingPlugin : public ImageProcessingPlugin {
 			const Circle &area,
 			const pair<int, int> &pixel_pos
 		);
+
+		inline vector<vector<double>> _positions;
+		
+		inline void _addPosition(double x, double y);
+
 };
 
 BallImageProcessingPlugin::BallImageProcessingPlugin() {
-//Insérez votre code ici
+	_positions.resize(0, vector<double>(2, 0));
 }
 
 BallImageProcessingPlugin::~BallImageProcessingPlugin() {
@@ -212,9 +217,38 @@ void BallImageProcessingPlugin::OnBallPosition(
 	double &out_dXDiff,
 	double &out_dYDiff
 ) {
-	//insérez votre code ici
+	
+	_positions.
+	
+	int N = _positions.size();
+	
+	float h = 1/30*34;
+	
 	out_dXDiff = 0.0;
 	out_dYDiff = 0.0;
+	
+	if (N == 1) {
+        out_dXDiff = 0;
+        out_dYDiff = 0;
+    } else if (N == 2) {
+        out_dXDiff = (-1*_positions(2,1)+1*_positions(1,1))/h;
+        out_dYDiff = (-1*_positions(2,2)+1*_positions(1,2))/h;
+    } else if (N == 3) {
+        out_dXDiff = (1*_positions(3,1)-4*_positions(2,1)+3*_positions(1,1))/(2*h);
+        out_dYDiff = (1*_positions(3,2)-4*_positions(2,2)+3*_positions(1,2))/(2*h);
+    } else if (N == 4) {
+        out_dXDiff = (-2*_positions(4,1)+9*_positions(3,1)-18*_positions(2,1)+11*_positions(1,1))/(6*h);
+        out_dYDiff = (-2*_positions(4,2)+9*_positions(3,2)-18*_positions(2,2)+11*_positions(1,2))/(6*h);
+    } else if (N == 5) {
+        out_dXDiff = (3*_positions(5,1)-16*_positions(4,1)+36*_positions(3,1)-48*_positions(2,1)+25*_positions(1,1))/(12*h);
+        out_dYDiff = (3*_positions(5,2)-16*_positions(4,2)+36*_positions(3,2)-48*_positions(2,2)+25*_positions(1,2))/(12*h);
+    } else if (N == 6) {
+        out_dXDiff = (-12*_positions(6,1)+75*_positions(5,1)-200*_positions(4,1)+300*_positions(3,1)-300*_positions(2,1)+137*_positions(1,1))/(60*h);
+        out_dYDiff = (-12*_positions(6,2)+75*_positions(5,2)-200*_positions(4,2)+300*_positions(3,2)-300*_positions(2,2)+137*_positions(1,2))/(60*h);
+    } else if (N == 7)
+        out_dXDiff = (10*_positions(7,1)-72*_positions(6,1)+225*_positions(5,1)-400*_positions(4,1)+450*_positions(3,1)-360*_positions(2,1)+147*_positions(1,1))/(60*h);
+        out_dYDiff = (10*_positions(7,2)-72*_positions(6,2)+225*_positions(5,2)-400*_positions(4,2)+450*_positions(3,1)-360*_positions(2,1)+147*_positions(1,2))/(60*h); 
+    }      
 }
 
 vector<vector<bool>> BallImageProcessingPlugin::_ImgPreProcessing(
@@ -535,6 +569,21 @@ pair<int, int> BallImageProcessingPlugin::_calculateCenterOfMassOfTheBall(
 	if(!nb_pix_x) return pair<int, int>(-1, -1);
 
 	return pair<int, int>(mass_x/nb_pix_x, mass_y/nb_pix_y);
+}
+
+void BallImageProcessingPlugin::_addPosition(double x, double y) {
+	int N = _positions.size();
+	
+	vector<double> pos;
+	pos.push_back(x);
+	pos.push_back(y);
+	
+	if (N == 7) {
+    	_positions.pop_back();
+    }
+	
+	_positions = _positions.push_front(pos);
+ 
 }
 
 
