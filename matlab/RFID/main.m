@@ -4,6 +4,9 @@ close all
 
 load('signaux.mat');
 
+%% flags
+IS_PASS_BAND_BUTTER = false;
+
 %% vars
 M = 1;
 sig = signal_1a;
@@ -11,7 +14,7 @@ sig = signal_1a;
 % sig = sin(2*pi*(f0-165E3) * time) + sin(2*pi*(f0+165E3) * time);
 sig_len = length(sig);
 
-seg_len = 64;
+seg_len = 12;
 
 fs = 1/(time(2)-time(1));
 fs_bins_len = sig_len;
@@ -24,8 +27,7 @@ downsample_value = nb_samples_per_bit/seg_len;
 max_stop_freq_fir = fs / (2*downsample_value);
 fc = max_stop_freq_fir/2; % Center
 
-% round((10.7E6 - fc)/50E3) = 193
-LO2 = 50E3 * 193;
+LO2 = 50E3 * round((10.7E6 - fc)/50E3); % 210
 bandwidth = 330E3;
 
 %% Clock LO2 (frequencies shift)
@@ -67,24 +69,32 @@ xlim([0, fs]);
 filters_freq_band = linspace(-bandwidth/2, bandwidth/2, 2*M+1) + fc;
 
 filtered_segments = zeros(2*M, seg_len, nb_bits);
-filter_order = 20;
-filter_len = filter_order+1;
+
+if IS_PASS_BAND_BUTTER
+    butter_order = 4 - M;
+else 
+    filter_order = 20;
+    filter_len = filter_order+1;
+end
 
 freq_offset = 50E3;
 
 figure
 for i=1:2*M
-    b = fir1(filter_order, freq2rad([filters_freq_band(i)+freq_offset, filters_freq_band(i+1)-freq_offset], fs), 'bandpass', ones(filter_len, 1));
+    if IS_PASS_BAND_BUTTER
+        [b, a] = butter(butter_order, freq2rad([filters_freq_band(i)+freq_offset, filters_freq_band(i+1)-freq_offset], fs),  'bandpass');
+    else 
+        b = fir1(filter_order, freq2rad([filters_freq_band(i)+freq_offset, filters_freq_band(i+1)-freq_offset], fs), 'bandpass', ones(filter_len, 1));
+        a = 1;
+    end
 
     for seg_index=0:nb_bits-1
         seg_indexes = (1:seg_len) + seg_index*seg_len;
         seg = sig(seg_indexes);
-        filtered_segments(i, :, seg_index+1) = filter(b, 1, seg)';
+        filtered_segments(i, :, seg_index+1) = filter(b, a, seg)';
     end
 end
 hold off
-
-
 
 %% 12 Demod
 filter_fast_len = seg_len;
@@ -97,7 +107,7 @@ filter_slow = ones(1, filter_fast_len)/filter_slow_len;
 binary_segments = false(2*M, seg_len, nb_bits);
 
 figure
-for i=2:2*M
+for i=1:2*M
 
     for seg_index=1:nb_bits
         seg_fast = abs(filtered_segments(i, :, seg_index));
