@@ -51,9 +51,9 @@ int main( int argc, char **argv)
 		plugin.OnImage(imgs[i % imgs_len], IMAGE_WIDTH, IMAGE_HEIGHT, x, y);
 		plugin.OnBallPosition(x, y, dx, dy);
 
-		// if(x < 0) {
-		// 	cout << "WRONG " << to_string(i % imgs_len) << endl; 
-		// }
+		if(x < 0) {
+			cout << "WRONG " << to_string(i % imgs_len) << endl; 
+		}
 		// cout << "(" << to_string(x) << ", " << to_string(y) << ") " << "[" << to_string(dx) << ", " << to_string(dy) << "]" << endl;
 	}
 	clock_t end_time = clock();
