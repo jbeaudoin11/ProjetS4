@@ -5,7 +5,7 @@ close all
 load('signaux.mat');
 
 %% flags
-IS_PASS_BAND_BUTTER = false;
+IS_PASS_BAND_RII = false;
 
 %% vars
 M = 1;
@@ -70,7 +70,7 @@ filters_freq_band = linspace(-bandwidth/2, bandwidth/2, 2*M+1) + fc;
 
 filtered_segments = zeros(2*M, seg_len, nb_bits);
 
-if IS_PASS_BAND_BUTTER
+if IS_PASS_BAND_RII
     butter_order = 4 - M;
 else 
     filter_order = 20;
@@ -81,10 +81,14 @@ freq_offset = 50E3;
 
 figure
 for i=1:2*M
-    if IS_PASS_BAND_BUTTER
-        [b, a] = butter(butter_order, freq2rad([filters_freq_band(i)+freq_offset, filters_freq_band(i+1)-freq_offset], fs),  'bandpass');
+    filter_freqs = [filters_freq_band(i)+freq_offset, filters_freq_band(i+1)-freq_offset];
+    
+    if IS_PASS_BAND_RII
+        fc_filter = filters_freq_band(i) + (filters_freq_band(i+1) - filters_freq_band(i))/2;
+        fc_filter_norm_pi = freq2rad(fc_filter, fs) * pi;
+        [b5, a5] = zp2tf([-0.75; 0.75], [0.85*exp(1i*fc_filter_norm_pi); 0.85*exp(-1i*fc_filter_norm_pi)], 0.177);
     else 
-        b = fir1(filter_order, freq2rad([filters_freq_band(i)+freq_offset, filters_freq_band(i+1)-freq_offset], fs), 'bandpass', ones(filter_len, 1));
+        b = fir1(filter_order, freq2rad(filter_freqs, fs), 'bandpass', ones(filter_len, 1));
         a = 1;
     end
 
@@ -100,7 +104,7 @@ hold off
 filter_fast_len = seg_len;
 filter_fast = ones(1, filter_fast_len)/filter_fast_len;
 
-nb_seg_filter_slow = 10;
+nb_seg_filter_slow = 3;
 filter_slow_len = seg_len * nb_seg_filter_slow;
 filter_slow = ones(1, filter_fast_len)/filter_slow_len;
 
@@ -108,28 +112,43 @@ binary_segments = false(2*M, seg_len, nb_bits);
 
 figure
 for i=1:2*M
-
     for seg_index=1:nb_bits
         seg_fast = abs(filtered_segments(i, :, seg_index));
         
         if seg_index < nb_seg_filter_slow
-            % Add zeros when we dont have any signal
+            % Add zeros when we dont have enough signal
             seg_slow = cat(3, zeros(1, seg_len, nb_seg_filter_slow-seg_index), abs(filtered_segments(i, :, 1:seg_index)));
         else
             seg_slow = abs(filtered_segments(i, :, seg_index-nb_seg_filter_slow+1:seg_index));
         end
         seg_slow = reshape(seg_slow, 1, seg_len*nb_seg_filter_slow);
+%         
+%         seg_fast = conv(seg_fast, filter_fast);
+%         seg_slow = conv(seg_slow, filter_slow);
+%         
+%         seg_fast = seg_fast(1:end-length(filter_fast)+1);
+%         seg_slow = seg_slow(1:end-length(filter_slow)+1);
+
+        seg_fast = movmean(seg_fast, filter_fast_len);
+        seg_slow = movmean(seg_slow, filter_slow_len);
         
-        seg_fast = conv(seg_fast, filter_fast);
-        seg_slow = conv(seg_slow, filter_slow);
-        
-        seg_fast = seg_fast(1:end-length(filter_fast)+1);
-        seg_slow = seg_slow(1:end-length(filter_slow)+1);
+        mean_fast = mean(seg_fast);
+        mean_slow = mean(seg_slow);
         
         subplot(2, 1, 1)
         plot(seg_fast);
+        xlim([1, length(seg_fast)]);
+        
         subplot(2, 1, 2)
         plot(seg_slow);
+        hold on
+            plot([zeros(1, length(seg_slow) - length(seg_fast)), seg_fast]);
+            plot([length(seg_slow) - length(seg_fast), length(seg_slow) - length(seg_fast)], [0, 0.08]);
+%             mean_slow = 1.5 * mean_slow;
+%             plot([1, length(seg_slow)], [mean_slow, mean_slow]);
+        hold off
+        xlim([1, length(seg_slow)]);
+        
         
 %         binary_segments(i, :, seg_index) = 
 %         filtered_segments(i, :, seg_index) = filter(b, 1, seg)';

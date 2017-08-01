@@ -3,9 +3,9 @@ clear
 close all
 
 %% vars
-M = 1;
+% M = 1;
 % M = 2;
-% M = 3;
+M = 3;
 
 fs = 4224000;
 fc = fs/4;
@@ -25,15 +25,18 @@ freq_offset = 0.1 * half_f_bandwidth;
 
 figure
 for i=1:2*M
-    filters_freqs = [filters_freq_band(i)+freq_offset, filters_freq_band(i+1)-freq_offset]
-    freq2rad(filters_freqs, fs) * pi
+    filter_freqs = [filters_freq_band(i)+freq_offset, filters_freq_band(i+1)-freq_offset]
     
-    b1 = fir1(fir_order, freq2rad(filters_freqs, fs), 'bandpass', ones(fir_order+1, 1));
-    [b2, a2] = butter(butter_order, freq2rad(filters_freqs, fs),  'bandpass');
-    [b3, a3] = cheby1(cheby1_order, 1, freq2rad(filters_freqs, fs),  'bandpass');
-    [b4, a4] = ellip(ellip_order, 1, 80, freq2rad(filters_freqs, fs),  'bandpass');
-    b5 = [0.0355237633148164,-0.355237633148164];
-    a5 = [1,-0.325413535126088,0.64];
+    fc_filter = filters_freq_band(i) + (filters_freq_band(i+1) - filters_freq_band(i))/2;
+    fc_filter_norm_pi = freq2rad(fc_filter, fs) * pi;
+    
+%     [z, p, k] = butter(butter_order, freq2rad(filter_freqs, fs),  'bandpass');
+    
+    b1 = fir1(fir_order, freq2rad(filter_freqs, fs), 'bandpass', kaiser(fir_order+1, 0.5));
+    [b2, a2] = butter(butter_order, freq2rad(filter_freqs, fs),  'bandpass');
+    [b3, a3] = cheby1(cheby1_order, 1, freq2rad(filter_freqs, fs),  'bandpass');
+    [b4, a4] = ellip(ellip_order, 1, 80, freq2rad(filter_freqs, fs),  'bandpass');
+    [b5, a5] = zp2tf([-0.75; 0.75], [0.85*exp(1i*fc_filter_norm_pi); 0.85*exp(-1i*fc_filter_norm_pi)], 0.177);
     
 %     freqz(b5, a5);
 
@@ -43,7 +46,6 @@ for i=1:2*M
     [amp4] = freqz(b4, a4, 2048, fs);
     [amp5] = freqz(b5, a5, 2048, fs);
     
-    fc_filter = filters_freq_band(i) + (filters_freq_band(i+1) - filters_freq_band(i))/2;
     
     subplot(5, 1, 1)
     hold on
@@ -78,9 +80,7 @@ for i=1:2*M
         plot(f, abs(amp5))
         plot([fc_filter, fc_filter], [0, max(abs(amp5))])
         xlim([0, fs/2])
-        title(['Custom     [ordre = ', num2str(2), ']    [grpdelay  = ', num2str(max(grpdelay(b5, a5))), ']']);    
-
-
+        title(['Custom Cheby    [ordre = ', num2str(1), ']    [grpdelay  = ', num2str(max(grpdelay(b5, a5))), ']']);    
 end
 hold off
 
