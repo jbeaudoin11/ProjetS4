@@ -217,15 +217,18 @@ void BallImageProcessingPlugin::OnBallPosition(
 	double &out_dXDiff,
 	double &out_dYDiff
 ) {
-	
-	_positions.
+    
+    if (in_dXPos < 0 || in_dYpos < 0) {
+        out_dXDiff = 0.0;
+        out_dYDiff = 0.0;
+        return;
+    }
+    
+    _positions._addPosition(in_dXPos, in_dYPos);
 	
 	int N = _positions.size();
 	
 	float h = 1/30*34;
-	
-	out_dXDiff = 0.0;
-	out_dYDiff = 0.0;
 	
 	if (N == 1) {
         out_dXDiff = 0;
