@@ -79,7 +79,6 @@ end
 
 freq_offset = 50E3;
 
-figure
 for i=1:2*M
     filter_freqs = [filters_freq_band(i)+freq_offset, filters_freq_band(i+1)-freq_offset];
     
@@ -98,7 +97,6 @@ for i=1:2*M
         filtered_segments(i, :, seg_index+1) = filter(b, a, seg)';
     end
 end
-hold off
 
 %% 12 Demod
 filter_fast_len = seg_len;
@@ -123,14 +121,14 @@ for i=1:2*M
         end
         seg_slow = reshape(seg_slow, 1, seg_len*nb_seg_filter_slow);
 %         
-%         seg_fast = conv(seg_fast, filter_fast);
-%         seg_slow = conv(seg_slow, filter_slow);
-%         
-%         seg_fast = seg_fast(1:end-length(filter_fast)+1);
-%         seg_slow = seg_slow(1:end-length(filter_slow)+1);
+        seg_fast = conv(seg_fast, filter_fast);
+        seg_slow = conv(seg_slow, filter_slow);
+        
+        seg_fast = seg_fast(1:end-length(filter_fast)+1);
+        seg_slow = seg_slow(1:end-length(filter_slow)+1);
 
-        seg_fast = movmean(seg_fast, filter_fast_len);
-        seg_slow = movmean(seg_slow, filter_slow_len);
+%         seg_fast = movmean(seg_fast, filter_fast_len);
+%         seg_slow = movmean(seg_slow, filter_slow_len);
         
         mean_fast = mean(seg_fast);
         mean_slow = mean(seg_slow);
@@ -148,6 +146,8 @@ for i=1:2*M
 %             plot([1, length(seg_slow)], [mean_slow, mean_slow]);
         hold off
         xlim([1, length(seg_slow)]);
+        
+        
         
         
 %         binary_segments(i, :, seg_index) = 

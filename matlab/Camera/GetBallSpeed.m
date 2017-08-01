@@ -22,7 +22,7 @@ function [ speed_x, speed_y ] = GetBallSpeed( old_positions )
         speed_y = (-12*old_positions(6,2)+75*old_positions(5,2)-200*old_positions(4,2)+300*old_positions(3,2)-300*old_positions(2,2)+137*old_positions(1,2))/(60*h);
     elseif N == 7
         speed_x = (10*old_positions(7,1)-72*old_positions(6,1)+225*old_positions(5,1)-400*old_positions(4,1)+450*old_positions(3,1)-360*old_positions(2,1)+147*old_positions(1,1))/(60*h);
-        speed_y = (10*old_positions(7,2)-72*old_positions(6,2)+225*old_positions(5,2)-400*old_positions(4,2)+450*old_positions(3,1)-360*old_positions(2,1)+147*old_positions(1,2))/(60*h);   
+        speed_y = (10*old_positions(7,2)-72*old_positions(6,2)+225*old_positions(5,2)-400*old_positions(4,2)+450*old_positions(3,2)-360*old_positions(2,2)+147*old_positions(1,2))/(60*h);   
     end
 end
 

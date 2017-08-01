@@ -601,22 +601,22 @@ void BallImageProcessingPlugin::_addPosition(double x, double y) {
 }
 
 
-//ne rien modifier passé ce commentaire
-// extern "C"
-// {
-// 	ImageProcessingPlugin * Load();
-// 	void Unload( ImageProcessingPlugin * in_pPlugin );
-// }
+// ne rien modifier passé ce commentaire
+extern "C"
+{
+	ImageProcessingPlugin * Load();
+	void Unload( ImageProcessingPlugin * in_pPlugin );
+}
 
-// void Unload( ImageProcessingPlugin * in_pPlugin )
-// {
-// 	delete in_pPlugin;
-// }
+void Unload( ImageProcessingPlugin * in_pPlugin )
+{
+	delete in_pPlugin;
+}
 
-// ImageProcessingPlugin * Load()
-// {
-// 	//si vous changez le nom de la classe asssurez-vous de le changer aussi ci-dessous
-// 	return new BallImageProcessingPlugin;
-// }
+ImageProcessingPlugin * Load()
+{
+	//si vous changez le nom de la classe asssurez-vous de le changer aussi ci-dessous
+	return new BallImageProcessingPlugin;
+}
 
 #endif /* BALL_IMAGE_PROCESSING_PLUGIN_CPP_ */
