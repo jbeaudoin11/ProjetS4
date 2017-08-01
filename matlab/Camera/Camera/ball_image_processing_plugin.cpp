@@ -7,6 +7,8 @@
 #include <string>
 #include <iostream>
 #include <algorithm>
+#include <vector>
+#include <list>
 
 #include "image_processing_plugin.h"
 
@@ -26,6 +28,8 @@
 
 #define SEARCH_BALL_GRID_CELL_SIZE 4
 #define SEARCH_BALL_REGION_SIZE 40
+
+#define FPS 30
 
 using namespace std;
 
@@ -109,6 +113,8 @@ class BallImageProcessingPlugin : public ImageProcessingPlugin {
 		}
 
 	private:
+		vector<vector<double>> _pos_history;
+		
 
 		/*
 			Pre processing the image,
@@ -172,15 +178,15 @@ class BallImageProcessingPlugin : public ImageProcessingPlugin {
 			const Circle &area,
 			const pair<int, int> &pixel_pos
 		);
-
-		inline vector<vector<double>> _positions;
 		
+		/*
+			Add a position in the history buffer (max size = 7)
+		*/
 		inline void _addPosition(double x, double y);
-
 };
 
 BallImageProcessingPlugin::BallImageProcessingPlugin() {
-	_positions.resize(0, vector<double>(2, 0));
+	_pos_history.resize(0, vector<double>(2, 0));
 }
 
 BallImageProcessingPlugin::~BallImageProcessingPlugin() {
@@ -218,39 +224,45 @@ void BallImageProcessingPlugin::OnBallPosition(
 	double &out_dYDiff
 ) {
     
-    if (in_dXPos < 0 || in_dYpos < 0) {
+    if (in_dXPos < 0 || in_dYPos < 0) {
         out_dXDiff = 0.0;
-        out_dYDiff = 0.0;
+		out_dYDiff = 0.0;
+		_pos_history.clear();
         return;
     }
     
-    _positions._addPosition(in_dXPos, in_dYPos);
+	_addPosition(in_dXPos, in_dYPos);
 	
-	int N = _positions.size();
-	
-	float h = 1/30*34;
+	int N = _pos_history.size();
+	double h = 1.0/FPS;
+
+	// cout << to_string(N) << " " << to_string(h) << endl;
+	// for(int p=0; p<N; p++) {
+	// 	cout << "(" << to_string(_pos_history[p][0]) << ", " << to_string(_pos_history[p][1]) << ") ";
+	// }
+	// cout << endl;
 	
 	if (N == 1) {
-        out_dXDiff = 0;
-        out_dYDiff = 0;
+        out_dXDiff = 0.0;
+        out_dYDiff = 0.0;
     } else if (N == 2) {
-        out_dXDiff = (-1*_positions(2,1)+1*_positions(1,1))/h;
-        out_dYDiff = (-1*_positions(2,2)+1*_positions(1,2))/h;
+        out_dXDiff = (-_pos_history[1][0]+_pos_history[0][0])/h;
+        out_dYDiff = (-_pos_history[1][1]+_pos_history[0][1])/h;
     } else if (N == 3) {
-        out_dXDiff = (1*_positions(3,1)-4*_positions(2,1)+3*_positions(1,1))/(2*h);
-        out_dYDiff = (1*_positions(3,2)-4*_positions(2,2)+3*_positions(1,2))/(2*h);
+        out_dXDiff = (_pos_history[2][0]-4*_pos_history[1][0]+3*_pos_history[0][0])/(2*h);
+        out_dYDiff = (_pos_history[2][1]-4*_pos_history[1][1]+3*_pos_history[0][1])/(2*h);
     } else if (N == 4) {
-        out_dXDiff = (-2*_positions(4,1)+9*_positions(3,1)-18*_positions(2,1)+11*_positions(1,1))/(6*h);
-        out_dYDiff = (-2*_positions(4,2)+9*_positions(3,2)-18*_positions(2,2)+11*_positions(1,2))/(6*h);
+        out_dXDiff = (-2*_pos_history[3][0]+9*_pos_history[2][0]-18*_pos_history[1][0]+11*_pos_history[0][0])/(6*h);
+        out_dYDiff = (-2*_pos_history[3][1]+9*_pos_history[2][1]-18*_pos_history[1][1]+11*_pos_history[0][1])/(6*h);
     } else if (N == 5) {
-        out_dXDiff = (3*_positions(5,1)-16*_positions(4,1)+36*_positions(3,1)-48*_positions(2,1)+25*_positions(1,1))/(12*h);
-        out_dYDiff = (3*_positions(5,2)-16*_positions(4,2)+36*_positions(3,2)-48*_positions(2,2)+25*_positions(1,2))/(12*h);
+        out_dXDiff = (3*_pos_history[4][0]-16*_pos_history[3][0]+36*_pos_history[2][0]-48*_pos_history[1][0]+25*_pos_history[0][0])/(12*h);
+        out_dYDiff = (3*_pos_history[4][1]-16*_pos_history[3][1]+36*_pos_history[2][1]-48*_pos_history[1][1]+25*_pos_history[0][1])/(12*h);
     } else if (N == 6) {
-        out_dXDiff = (-12*_positions(6,1)+75*_positions(5,1)-200*_positions(4,1)+300*_positions(3,1)-300*_positions(2,1)+137*_positions(1,1))/(60*h);
-        out_dYDiff = (-12*_positions(6,2)+75*_positions(5,2)-200*_positions(4,2)+300*_positions(3,2)-300*_positions(2,2)+137*_positions(1,2))/(60*h);
-    } else if (N == 7)
-        out_dXDiff = (10*_positions(7,1)-72*_positions(6,1)+225*_positions(5,1)-400*_positions(4,1)+450*_positions(3,1)-360*_positions(2,1)+147*_positions(1,1))/(60*h);
-        out_dYDiff = (10*_positions(7,2)-72*_positions(6,2)+225*_positions(5,2)-400*_positions(4,2)+450*_positions(3,1)-360*_positions(2,1)+147*_positions(1,2))/(60*h); 
+        out_dXDiff = (-12*_pos_history[5][0]+75*_pos_history[4][0]-200*_pos_history[3][0]+300*_pos_history[2][0]-300*_pos_history[1][0]+137*_pos_history[0][0])/(60.0*h);
+        out_dYDiff = (-12*_pos_history[5][1]+75*_pos_history[4][1]-200*_pos_history[3][1]+300*_pos_history[2][1]-300*_pos_history[1][1]+137*_pos_history[0][1])/(60.0*h);
+    } else if (N == 7) {
+        out_dXDiff = (10*_pos_history[6][0]-72*_pos_history[5][0]+225*_pos_history[4][0]-400*_pos_history[3][0]+450*_pos_history[2][0]-360*_pos_history[1][0]+147*_pos_history[0][0])/(60*h);
+        out_dYDiff = (10*_pos_history[6][1]-72*_pos_history[5][1]+225*_pos_history[4][1]-400*_pos_history[3][1]+450*_pos_history[2][1]-360*_pos_history[1][1]+147*_pos_history[0][1])/(60*h); 
     }      
 }
 
@@ -575,18 +587,17 @@ pair<int, int> BallImageProcessingPlugin::_calculateCenterOfMassOfTheBall(
 }
 
 void BallImageProcessingPlugin::_addPosition(double x, double y) {
-	int N = _positions.size();
+	int N = _pos_history.size();
 	
 	vector<double> pos;
 	pos.push_back(x);
 	pos.push_back(y);
 	
 	if (N == 7) {
-    	_positions.pop_back();
+    	_pos_history.pop_back();
     }
 	
-	_positions = _positions.push_front(pos);
- 
+	_pos_history.insert(_pos_history.begin(), pos);
 }
 
 
