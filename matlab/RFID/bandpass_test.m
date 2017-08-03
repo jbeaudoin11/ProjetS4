@@ -36,7 +36,7 @@ for i=1:2*M
     [b2, a2] = butter(butter_order, freq2rad(filter_freqs, fs),  'bandpass');
     [b3, a3] = cheby1(cheby1_order, 1, freq2rad(filter_freqs, fs),  'bandpass');
     [b4, a4] = ellip(ellip_order, 1, 80, freq2rad(filter_freqs, fs),  'bandpass');
-    [b5, a5] = zp2tf([-0.75; 0.75], [0.85*exp(1i*fc_filter_norm_pi); 0.85*exp(-1i*fc_filter_norm_pi)], 0.177);
+    [b5, a5] = zp2tf([-0.75; 0.75], [0.85*exp(1i*fc_filter_norm_pi); 0.85*exp(-1i*fc_filter_norm_pi)], 0.1745);
     
 %     freqz(b5, a5);
 

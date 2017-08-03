@@ -58,7 +58,7 @@ function SetInputPortSampleTime(block, idx, st)
     
 % not call for some reason ??
 function SetOutputPortSampleTime(block, idx, st)
-    block.OutputPort(1).SampleTime = st;
+    block.OutputPort(1).SampleTime = [st(1)*12, st(2)];
     
 function InitializeConditions(block)
     block.Dwork(1).Data = 1;
