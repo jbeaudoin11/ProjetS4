@@ -1,5 +1,9 @@
 clc, clear, close all;
 
+%% Flags
+IS_SAVE_FIG = false;
+
+%%
 src_files = dir('vitesse_max_3/*.bmp');  % the folder in which ur images exists
 imgs_length = length(src_files);
 
@@ -38,13 +42,30 @@ end
 
 t = 0:39;
 
-figure
-% plot(t*34/30,speeds) % à modifier hihi 
-plot(speeds) % à modifier hihi 
+speed_fig = figure;
+plot(speeds)
+legend('X', 'Y');
 
-figure
+pos_fig = figure;
 plot(positions(:,1),-positions(:,2))
 xlim([1, 480]);
 ylim([-480, -1]);
+
+%% Save fig
+if IS_SAVE_FIG
+    simple_fig_save(speed_fig, 'graphs/speed.png');
+    simple_fig_save(pos_fig, 'graphs/pos.png'); 
+end
+
+
+
+
+
+
+
+
+
+
+
 
 
