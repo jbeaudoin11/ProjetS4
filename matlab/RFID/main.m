@@ -47,7 +47,7 @@ plot(fs_bins, abs(fft(sig, fs_bins_len)));
 xlim([0, fs]);
 
 %% RIF
-b = fir1(20, 0.0814, 'low', kaiser(21, 0.5));
+b = fir1(20, freq2rad(max_stop_freq_fir, fs), 'low', kaiser(21, 0.5));
 sig = filter(b, 1, sig);
 
 %% downsample N = 64
